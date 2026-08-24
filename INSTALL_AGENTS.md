@@ -51,7 +51,7 @@ Clients that accept a local MCP JSON file can use the repository root `.mcp.json
 
 On Windows, use `npx.cmd` if the client does not resolve `npx` automatically. Clients with a GUI for MCP servers should receive the same command and argument list as separate fields.
 
-For a pinned, reproducible installation, append a tag or commit to the Git package spec, for example `git+https://github.com/Desrid/desrid-html-to-figma.git#v1.1.0`.
+For a pinned, reproducible installation, append a tag or commit to the Git package spec, for example `git+https://github.com/Desrid/desrid-html-to-figma.git#v1.1.1`.
 
 ## Update
 

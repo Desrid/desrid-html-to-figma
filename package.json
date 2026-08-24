@@ -1,7 +1,7 @@
 {
   "name": "desrid-html-to-figma",
   "description": "Measured, editable HTML-to-Figma imports for design teams",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "module": "dist/talk_to_figma_mcp/server.js",
   "main": "dist/talk_to_figma_mcp/server.js",
   "bin": {
@@ -34,7 +34,6 @@
     "pack": "dxt pack",
     "sync-version": "VERSION=$(jq -r '.version' package.json) && jq --arg version \"$VERSION\" '.version = $version' manifest.json > manifest.tmp && mv manifest.tmp manifest.json",
     "build:dxt": "npm run build:win && npm run pack",
-    "prepare": "npm run build:win",
     "pub:release": "bun run build && npm publish",
     "configure-claude": "node scripts/configure-claude.js",
     "test": "jest",
@@ -44,6 +43,7 @@
     "test:integration": "node scripts/test-integration.js"
   },
   "devDependencies": {
+    "@modelcontextprotocol/sdk": "latest",
     "@anthropic-ai/dxt": "^0.2.0",
     "@types/bun": "latest",
     "@types/jest": "^29.5.12",
@@ -51,10 +51,7 @@
     "jest": "^29.7.0",
     "ts-jest": "^29.1.2",
     "tsup": "^8.4.0",
-    "typescript": "^5.8.3"
-  },
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "latest",
+    "typescript": "^5.8.3",
     "uuid": "latest",
     "ws": "latest",
     "zod": "^3.25.0"
