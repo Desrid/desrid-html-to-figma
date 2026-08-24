@@ -80,6 +80,9 @@ jobs:
         echo "📦 Creating DXT package..."
         dxt pack
         echo "✅ DXT package created successfully"
+
+    - name: Create generic MCP package
+      run: npm pack --ignore-scripts
       
     - name: Get package info
       id: package
@@ -93,6 +96,13 @@ jobs:
         name: ${{ steps.package.outputs.name }}-${{ steps.package.outputs.version }}.dxt
         path: ${{ steps.package.outputs.name }}.dxt
         retention-days: 90
+
+    - name: Upload generic MCP artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.package.outputs.name }}-${{ steps.package.outputs.version }}.tgz
+        path: ${{ steps.package.outputs.name }}-${{ steps.package.outputs.version }}.tgz
+        retention-days: 90
         
     - name: Upload to release (on release only)
       if: github.event_name == 'release'
@@ -101,6 +111,7 @@ jobs:
         echo "📦 Uploading DXT package to release..."
         gh release upload ${{ github.event.release.tag_name }} \
           ${{ steps.package.outputs.name }}.dxt \
+          ${{ steps.package.outputs.name }}-${{ steps.package.outputs.version }}.tgz \
           --clobber
         echo "✅ DXT package uploaded successfully"
       env:

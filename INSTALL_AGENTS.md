@@ -41,7 +41,7 @@ Clients that accept a local MCP JSON file can use the repository root `.mcp.json
       "command": "npx",
       "args": [
         "--yes",
-        "--package=git+https://github.com/Desrid/desrid-html-to-figma.git",
+        "--package=https://github.com/Desrid/desrid-html-to-figma/releases/download/v1.1.2/desrid-html-to-figma-1.1.2.tgz",
         "desrid-html-to-figma-server"
       ]
     }
@@ -51,13 +51,13 @@ Clients that accept a local MCP JSON file can use the repository root `.mcp.json
 
 On Windows, use `npx.cmd` if the client does not resolve `npx` automatically. Clients with a GUI for MCP servers should receive the same command and argument list as separate fields.
 
-For a pinned, reproducible installation, append a tag or commit to the Git package spec, for example `git+https://github.com/Desrid/desrid-html-to-figma.git#v1.1.1`.
+The GitHub Release tarball is already pinned to `v1.1.2`. To upgrade, replace both version occurrences in its URL with the newer release number.
 
 ## Update
 
 - Codex marketplace: `codex plugin marketplace upgrade desrid-html-to-figma`, then reinstall the plugin.
 - Git clone: `git pull`, `npm install`, and `npm run build:win`.
-- Git-backed `npx`: pin a new release tag or clear the client's package cache if it keeps an older build.
+- GitHub Release `npx`: replace the versioned `.tgz` URL or clear the client's package cache if it keeps an older build.
 
 ## Architecture
 

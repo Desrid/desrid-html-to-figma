@@ -1,7 +1,7 @@
 {
   "name": "desrid-html-to-figma",
   "description": "Measured, editable HTML-to-Figma imports for design teams",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "module": "dist/talk_to_figma_mcp/server.js",
   "main": "dist/talk_to_figma_mcp/server.js",
   "bin": {

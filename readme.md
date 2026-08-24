@@ -24,7 +24,7 @@ codex plugin add desrid-html-to-figma@desrid-html-to-figma
       "command": "npx",
       "args": [
         "--yes",
-        "--package=git+https://github.com/Desrid/desrid-html-to-figma.git",
+        "--package=https://github.com/Desrid/desrid-html-to-figma/releases/download/v1.1.2/desrid-html-to-figma-1.1.2.tgz",
         "desrid-html-to-figma-server"
       ]
     }
@@ -106,10 +106,10 @@ Generate production-ready code directly from designs:
 Open your terminal, navigate to the folder where you want to install the tool, and run:
 
 ```bash
-npx --yes --package=git+https://github.com/Desrid/desrid-html-to-figma.git desrid-html-to-figma
+npx --yes --package=https://github.com/Desrid/desrid-html-to-figma/releases/download/v1.1.2/desrid-html-to-figma-1.1.2.tgz desrid-html-to-figma
 ```
 
-> **💡 Tip**: This command is an "all-in-one" (clones, installs, and starts). In subsequent sessions, if you're already inside `your-project/desrid-html-to-figma`, run `npm run socket`.
+> **💡 Tip**: This command downloads the versioned GitHub Release package and starts the local bridge. For a cloned checkout, run `npm run socket` in subsequent sessions.
 
 ### Step 2: Install the plugin in Figma
 
@@ -135,7 +135,7 @@ Download [desrid-html-to-figma.dxt](https://github.com/Desrid/desrid-html-to-fig
     "mcpServers": {
       "desrid_html_to_figma": {
         "command": "npx",
-        "args": ["--yes", "--package=git+https://github.com/Desrid/desrid-html-to-figma.git", "desrid-html-to-figma-server"]
+        "args": ["--yes", "--package=https://github.com/Desrid/desrid-html-to-figma/releases/download/v1.1.2/desrid-html-to-figma-1.1.2.tgz", "desrid-html-to-figma-server"]
       }
     }
   }

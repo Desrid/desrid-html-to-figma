@@ -9,6 +9,7 @@ package-lock.json
 
 # DXT packages (build artifacts - distribute via releases only)
 *.dxt
+*.tgz
 
 # macOS system files
 .DS_Store
