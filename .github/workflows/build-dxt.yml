@@ -67,9 +67,9 @@ jobs:
           ls -la dist/ || echo "dist/ directory not found"
           exit 1
         fi
-        if [ ! -f "dist/socket.cjs" ]; then
+        if [ ! -f "dist/socket-node.cjs" ]; then
           echo "❌ Error: Socket server not found after build"
-          echo "Expected: dist/socket.cjs"
+          echo "Expected: dist/socket-node.cjs"
           exit 1
         fi
         echo "✅ Build output validated successfully"

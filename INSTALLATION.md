@@ -4,6 +4,8 @@
 
 This guide covers all installation and configuration methods for different Agentic Tools.
 
+> This is the upstream compatibility guide. For this Desrid fork and Git-based installation, use [INSTALL_AGENTS.md](INSTALL_AGENTS.md). It contains the current Codex marketplace, Claude Desktop DXT, and generic MCP commands.
+
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/en/download)

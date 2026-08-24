@@ -7,6 +7,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-08-24
+
+### Added
+- Measured HTML-to-Figma snapshot import with editable Figma layers and Auto Layout support.
+- Git-backed Codex plugin marketplace, plugin manifest, bundled workflow skill, and local MCP configuration.
+- Generic Git-based MCP installation for Claude Code, Cursor, Windsurf, Cline, Roo Code, and other stdio MCP clients.
+- Node.js WebSocket bridge, browser capture helper, and browser extension.
+- Standalone MCP smoke test that verifies the bundled server outside the project dependency tree.
+
+### Changed
+- Rebranded the distributable package as **Desrid HTML to Figma** while retaining upstream attribution.
+- Bundled runtime dependencies into standalone CommonJS entry points for Git and DXT installs.
+- Updated GitHub Actions to validate the standalone bridge and build the Claude Desktop DXT package.
+
 ## [1.0.0] - 2026-04-18
 
 ### Added

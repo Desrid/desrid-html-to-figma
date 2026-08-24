@@ -39,3 +39,12 @@ dxt-*/
 
 # Claude Code local settings
 .claude/
+
+# Codex and generic MCP installs do not run package-manager lifecycle scripts.
+# Keep the two standalone runtime entry points in Git.
+!dist/
+dist/*
+!dist/socket-node.cjs
+!dist/talk_to_figma_mcp/
+dist/talk_to_figma_mcp/*
+!dist/talk_to_figma_mcp/server.cjs

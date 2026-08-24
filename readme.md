@@ -4,6 +4,38 @@
 
 Enable your AI agents to read, analyze, and modify Figma designs.
 
+## Install from this Git repository
+
+This fork is packaged for Codex, Claude Desktop, Claude Code, Cursor, Windsurf, Cline, Roo Code, and any client that supports local `stdio` MCP servers.
+
+**Codex:**
+
+```bash
+codex plugin marketplace add Desrid/desrid-html-to-figma --ref main
+codex plugin add desrid-html-to-figma@desrid-html-to-figma
+```
+
+**Generic MCP client:** use the root `.mcp.json`, or configure the command from GitHub:
+
+```json
+{
+  "mcpServers": {
+    "desrid_html_to_figma": {
+      "command": "npx",
+      "args": [
+        "--yes",
+        "--package=git+https://github.com/Desrid/desrid-html-to-figma.git",
+        "desrid-html-to-figma-server"
+      ]
+    }
+  }
+}
+```
+
+**Claude Desktop:** open `desrid-html-to-figma.dxt` from GitHub Releases.
+
+All clients also need the local Figma development plugin and WebSocket bridge. See [the cross-agent installation guide](INSTALL_AGENTS.md) or [the Codex guide](INSTALL_CODEX.md).
+
 Works with your favorite agentic tools:
 
 - [Claude Desktop](https://claude.ai/)
@@ -74,10 +106,10 @@ Generate production-ready code directly from designs:
 Open your terminal, navigate to the folder where you want to install the tool, and run:
 
 ```bash
-npx claude-talk-to-figma-mcp
+npx --yes --package=git+https://github.com/Desrid/desrid-html-to-figma.git desrid-html-to-figma
 ```
 
-> **💡 Tip**: This command is an "all-in-one" (clones, installs, and starts). In subsequent sessions, if you're already inside the project folder `your-project/claude-talk-to-figma-mcp`, you can simply run `bun run socket`.
+> **💡 Tip**: This command is an "all-in-one" (clones, installs, and starts). In subsequent sessions, if you're already inside `your-project/desrid-html-to-figma`, run `npm run socket`.
 
 ### Step 2: Install the plugin in Figma
 
@@ -91,7 +123,7 @@ In Figma Desktop go to Menu → Plugins → Development → Import plugin from m
 
 #### Claude Desktop
 
-Download [claude-talk-to-figma-mcp.dxt](https://github.com/arinspunk/claude-talk-to-figma-mcp/releases) (from Assets section of the latest release) and double-click. Claude configures itself automatically.
+Download [desrid-html-to-figma.dxt](https://github.com/Desrid/desrid-html-to-figma/releases) from the latest release and double-click. Claude configures itself automatically.
 
 #### Cursor
 
@@ -101,9 +133,9 @@ Download [claude-talk-to-figma-mcp.dxt](https://github.com/arinspunk/claude-talk
   ```json
   {
     "mcpServers": {
-      "ClaudeTalkToFigma": {
+      "desrid_html_to_figma": {
         "command": "npx",
-        "args": ["-p", "claude-talk-to-figma-mcp@latest", "claude-talk-to-figma-mcp-server"]
+        "args": ["--yes", "--package=git+https://github.com/Desrid/desrid-html-to-figma.git", "desrid-html-to-figma-server"]
       }
     }
   }
@@ -126,7 +158,7 @@ For other tools (Claude Code, Windsurf, VS Code + GitHub Copilot, Cline, Roo Cod
 
 To use the MCP again in day-to-day work, you don't need to repeat the entire process:
 
-1. **Start the socket**: In the terminal, enter the project folder `your-project/claude-talk-to-figma-mcp` and run `bun run socket` (or `npm run socket`).
+1. **Start the socket**: In the terminal, enter `your-project/desrid-html-to-figma` and run `npm run socket`.
 2. **Open the plugin in Figma**: You'll find it in your recent plugins list.
 3. **Connect the AI**: Copy the channel ID and tell your agent: `Connect to Figma, channel {your-ID}`.
 
@@ -187,6 +219,6 @@ If you want to know about all project contributions, you can visit the ["Contrib
 
 ### Need something specific?
 
-**[Propose new ones on GitHub Issues](https://github.com/arinspunk/claude-talk-to-figma-mcp/issues)**
+**[Propose new ones on GitHub Issues](https://github.com/Desrid/desrid-html-to-figma/issues)**
 
 Your feedback and contributions keep the project alive. ❤️

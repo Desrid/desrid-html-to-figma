@@ -1,18 +1,18 @@
 {
   "dxt_version": "0.1",
-  "name": "claude-talk-to-figma-mcp",
-  "display_name": "Claude Talk to Figma",
-  "description": "A Model Context Protocol (MCP) plugin that allows Claude Desktop and other AI tools to interact directly with Figma, enabling powerful AI-assisted design capabilities.",
-  "version": "1.0.0",
+  "name": "desrid-html-to-figma",
+  "display_name": "Desrid HTML to Figma",
+  "description": "Import measured HTML layouts into editable Figma frames with Auto Layout.",
+  "version": "1.1.0",
   "author": {
-    "name": "Xúlio Zé",
-    "url": "https://github.com/arinspunk"
+    "name": "Desrid",
+    "url": "https://github.com/Desrid"
   },
   "license": "MIT",
-  "homepage": "https://github.com/arinspunk/claude-talk-to-figma-mcp",
+  "homepage": "https://github.com/Desrid/desrid-html-to-figma",
   "repository": {
     "type": "git",
-    "url": "https://github.com/arinspunk/claude-talk-to-figma-mcp.git"
+    "url": "https://github.com/Desrid/desrid-html-to-figma.git"
   },
   "icon": "images/claude-talk-to-figma.png",
   "compatibility": {

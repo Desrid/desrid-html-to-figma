@@ -1,6 +1,7 @@
 # Development files
 .git/
 .gitignore
+node_modules/
 node_modules/@types/
 node_modules/@jest/
 node_modules/jest/

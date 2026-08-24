@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Desrid HTML to Figma Capture",
+  "version": "1.0.0",
+  "description": "Captures the rendered DOM of the active page for Desrid HTML to Figma without changing site source code.",
+  "permissions": ["activeTab", "tabs", "downloads", "scripting", "offscreen"],
+  "host_permissions": ["<all_urls>"],
+  "action": { "default_title": "Capture page for Figma", "default_popup": "popup.html" },
+  "background": { "service_worker": "background.js", "type": "module" },
+  "content_scripts": [{ "matches": ["<all_urls>"], "js": ["content.js"], "run_at": "document_idle" }]
+}

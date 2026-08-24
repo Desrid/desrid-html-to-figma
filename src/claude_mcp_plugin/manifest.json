@@ -1,6 +1,6 @@
 {
-  "name": "Claude Talk to Figma Plugin",
-  "id": "claude-mcp-plugin",
+  "name": "Desrid HTML to Figma",
+  "id": "desrid-html-to-figma",
   "api": "1.0.0",
   "main": "code.js",
   "ui": "ui.html",

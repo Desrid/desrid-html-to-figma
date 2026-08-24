@@ -175,7 +175,7 @@ clone_node(nodeId: "selected-node-id", x: [new-x], y: [new-y])
 
 // Replace text chunk by chunk
 set_multiple_text_contents(
-  nodeId: "parent-node-id", 
+  nodeId: "parent-node-id",
   text: [
     { nodeId: "node-id-1", text: "New text 1" },
     // More nodes in this chunk...

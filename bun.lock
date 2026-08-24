@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "cursor-talk-to-figma-mcp",
+      "name": "desrid-html-to-figma",
       "dependencies": {
         "@modelcontextprotocol/sdk": "latest",
         "uuid": "latest",

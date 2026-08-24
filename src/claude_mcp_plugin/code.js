@@ -61,7 +61,7 @@ function sendProgressUpdate(commandId, commandType, status, progress, totalItems
 }
 
 // Show UI
-figma.showUI(__html__, { width: 300, height: 220 });
+figma.showUI(__html__, { width: 360, height: 285, themeColors: true });
 
 // Plugin commands from UI
 figma.ui.onmessage = async (msg) => {
@@ -146,6 +146,8 @@ async function handleCommand(command, params) {
       return await createFrame(params);
     case "create_text":
       return await createText(params);
+    case "import_html_snapshot":
+      return await importHtmlSnapshot(params);
     case "set_fill_color":
       return await setFillColor(params);
     case "set_stroke_color":
@@ -687,6 +689,177 @@ async function createText(params) {
     fills: textNode.fills,
     parentId: textNode.parent ? textNode.parent.id : undefined,
   };
+}
+
+// HTML-to-Figma importer ---------------------------------------------------
+// Input is intentionally a measured DOM snapshot. This keeps the placement
+// deterministic and lets designers edit the resulting nodes instead of
+// importing a flat screenshot.
+function htmlColor(value) {
+  if (!value || value === "transparent" || value === "rgba(0, 0, 0, 0)") return null;
+  var match = String(value).match(/rgba?\(([^)]+)\)/i);
+  if (!match) return null;
+  var parts = match[1].split(",").map(function (part) { return parseFloat(part.trim()); });
+  if (parts.length < 3 || parts.slice(0, 3).some(isNaN)) return null;
+  return { type: "SOLID", color: { r: parts[0] / 255, g: parts[1] / 255, b: parts[2] / 255 }, opacity: isNaN(parts[3]) ? 1 : parts[3] };
+}
+
+function htmlNumber(value, fallback) {
+  var parsed = parseFloat(value);
+  return isNaN(parsed) ? fallback : parsed;
+}
+
+function htmlAlign(value, fallback) {
+  var map = { "flex-start": "MIN", start: "MIN", center: "CENTER", "flex-end": "MAX", end: "MAX", "space-between": "SPACE_BETWEEN" };
+  return map[value] || fallback;
+}
+
+function htmlFontStyle(weight) {
+  var numeric = parseInt(weight, 10);
+  if (numeric >= 800) return "Extra Bold";
+  if (numeric >= 700) return "Bold";
+  if (numeric >= 600) return "Semi Bold";
+  if (numeric >= 500) return "Medium";
+  if (numeric <= 300) return "Light";
+  return "Regular";
+}
+
+async function importHtmlSnapshot(params) {
+  var snapshot = params && params.snapshot;
+  if (!snapshot || !snapshot.root || !snapshot.root.box) throw new Error("Invalid snapshot: expected { root: { box, style, children } }");
+  var offsetX = htmlNumber(params.x, 0);
+  var offsetY = htmlNumber(params.y, 0);
+  var warnings = [];
+  var importedNodes = 0;
+  var skippedNodes = 0;
+  var rootBox = snapshot.root.box;
+  var parent = params.parentId ? await getNodeByIdSafe(params.parentId) : figma.currentPage;
+  if (!parent || !("appendChild" in parent)) throw new Error("Target parent does not support children");
+
+  function addPixelReference(root) {
+    var reference = snapshot.pixelReference;
+    if (!reference || !reference.dataUrl || typeof figma.base64Decode !== "function") return null;
+    try {
+      var base64 = String(reference.dataUrl).split(",")[1];
+      if (!base64) return null;
+      var image = figma.createImage(figma.base64Decode(base64));
+      var layer = figma.createRectangle();
+      layer.name = "Reference — rendered masks & effects";
+      layer.resize(Math.max(1, reference.width || root.width), Math.max(1, reference.height || root.height));
+      layer.fills = [{ type: "IMAGE", scaleMode: "FILL", imageHash: image.hash }];
+      layer.locked = true;
+      layer.opacity = reference.opacity === undefined ? 1 : reference.opacity;
+      root.insertChild(0, layer);
+      return layer;
+    } catch (error) {
+      warnings.push("Could not create the rendered-effects reference layer.");
+      return null;
+    }
+  }
+
+  async function createTextFromSnapshot(item, parentNode, rootLeft, rootTop) {
+    var style = item.style || {};
+    var text = figma.createText();
+    text.name = item.name || "Text";
+    var font = { family: style.fontFamily || "Inter", style: htmlFontStyle(style.fontWeight) };
+    try {
+      await figma.loadFontAsync(font);
+      text.fontName = font;
+    } catch (error) {
+      warnings.push("Font '" + font.family + " " + font.style + "' unavailable; used Inter.");
+      await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+      text.fontName = { family: "Inter", style: "Regular" };
+    }
+    text.fontSize = htmlNumber(style.fontSize, 14);
+    var fill = htmlColor(style.color);
+    if (fill) text.fills = [fill];
+    text.letterSpacing = { value: htmlNumber(style.letterSpacing, 0), unit: "PIXELS" };
+    var lineHeight = htmlNumber(style.lineHeight, 0);
+    if (lineHeight > 0) text.lineHeight = { value: lineHeight, unit: "PIXELS" };
+    text.textAlignHorizontal = style.textAlign === "center" ? "CENTER" : style.textAlign === "right" ? "RIGHT" : "LEFT";
+    await setCharacters(text, item.text || "");
+    parentNode.appendChild(text);
+    var box = item.box;
+    if (parentNode.layoutMode === "NONE" || style.position === "absolute" || style.position === "fixed") {
+      if (parentNode.layoutMode !== "NONE") text.layoutPositioning = "ABSOLUTE";
+      text.x = box.x - rootLeft;
+      text.y = box.y - rootTop;
+      text.textAutoResize = "HEIGHT";
+      text.resize(Math.max(1, box.width), Math.max(1, text.height));
+    } else {
+      text.textAutoResize = "HEIGHT";
+      text.resize(Math.max(1, box.width), Math.max(1, text.height));
+    }
+    importedNodes++;
+    return text;
+  }
+
+  async function createSvgFromSnapshot(item, parentNode, rootLeft, rootTop) {
+    if (!item.svg || !item.svg.includes("<svg")) { skippedNodes++; warnings.push("An SVG item had no usable markup."); return null; }
+    var node = figma.createNodeFromSvg(sanitizeSvg(item.svg));
+    node.name = item.name || "SVG";
+    parentNode.appendChild(node);
+    var box = item.box;
+    var style = item.style || {};
+    if (parentNode.layoutMode === "NONE" || style.position === "absolute" || style.position === "fixed") {
+      if (parentNode.layoutMode !== "NONE" && "layoutPositioning" in node) node.layoutPositioning = "ABSOLUTE";
+      node.x = box.x - rootLeft;
+      node.y = box.y - rootTop;
+    }
+    if ("resize" in node && box.width > 0 && box.height > 0) node.resize(Math.max(1, box.width), Math.max(1, box.height));
+    importedNodes++;
+    return node;
+  }
+
+  async function createElement(item, parentNode, rootLeft, rootTop, isRoot) {
+    if (!item || !item.box || item.box.width < 0.5 || item.box.height < 0.5) { skippedNodes++; return null; }
+    if (item.kind === "text") return await createTextFromSnapshot(item, parentNode, rootLeft, rootTop);
+    if (item.kind === "svg") return await createSvgFromSnapshot(item, parentNode, rootLeft, rootTop);
+    var style = item.style || {};
+    var box = item.box;
+    var node = figma.createFrame();
+    node.name = (isRoot && params.name) || item.name || item.tag || "Element";
+    node.resize(Math.max(1, box.width), Math.max(1, box.height));
+    var fill = htmlColor(style.backgroundColor);
+    node.fills = fill ? [fill] : [];
+    var border = htmlColor(style.borderColor);
+    var borderWidth = htmlNumber(style.borderWidth, 0);
+    if (border && borderWidth > 0) { node.strokes = [border]; node.strokeWeight = borderWidth; }
+    var radius = htmlNumber(style.borderRadius, 0);
+    if (radius > 0) node.cornerRadius = radius;
+    node.clipsContent = style.overflow === "hidden" || style.overflow === "clip";
+    if (!isRoot && (parentNode.layoutMode === "NONE" || style.position === "absolute" || style.position === "fixed")) {
+      if (parentNode.layoutMode !== "NONE") node.layoutPositioning = "ABSOLUTE";
+      node.x = box.x - rootLeft;
+      node.y = box.y - rootTop;
+    } else if (isRoot) {
+      node.x = offsetX;
+      node.y = offsetY;
+    }
+    parentNode.appendChild(node);
+    importedNodes++;
+
+    if (style.display === "flex") {
+      node.layoutMode = style.flexDirection === "column" || style.flexDirection === "column-reverse" ? "VERTICAL" : "HORIZONTAL";
+      node.paddingTop = htmlNumber(style.paddingTop, 0);
+      node.paddingRight = htmlNumber(style.paddingRight, 0);
+      node.paddingBottom = htmlNumber(style.paddingBottom, 0);
+      node.paddingLeft = htmlNumber(style.paddingLeft, 0);
+      node.itemSpacing = htmlNumber(style.gap, 0);
+      node.primaryAxisAlignItems = htmlAlign(style.justifyContent, "MIN");
+      node.counterAxisAlignItems = htmlAlign(style.alignItems, "MIN");
+      if (style.flexWrap === "wrap") node.layoutWrap = "WRAP";
+    }
+    var children = item.children || [];
+    for (var i = 0; i < children.length; i++) await createElement(children[i], node, box.x, box.y, false);
+    return node;
+  }
+
+  var importedRoot = await createElement(snapshot.root, parent, rootBox.x, rootBox.y, true);
+  var pixelReference = importedRoot ? addPixelReference(importedRoot) : null;
+  figma.currentPage.selection = importedRoot ? [importedRoot] : [];
+  figma.viewport.scrollAndZoomIntoView(importedRoot ? [importedRoot] : []);
+  return { id: importedRoot ? importedRoot.id : null, pixelReferenceId: pixelReference ? pixelReference.id : null, importedNodes: importedNodes, skippedNodes: skippedNodes, warnings: Array.from(new Set(warnings)).slice(0, 8), viewport: snapshot.viewport || null };
 }
 
 async function setFillColor(params) {

@@ -1,27 +1,31 @@
 {
-  "name": "claude-talk-to-figma-mcp",
-  "description": "Claude Desktop Talk to Figma MCP",
-  "version": "1.0.0",
+  "name": "desrid-html-to-figma",
+  "description": "Measured, editable HTML-to-Figma imports for design teams",
+  "version": "1.1.0",
   "module": "dist/talk_to_figma_mcp/server.js",
   "main": "dist/talk_to_figma_mcp/server.js",
   "bin": {
-    "claude-talk-to-figma-mcp": "scripts/launcher.js",
-    "claude-talk-to-figma-mcp-server": "dist/talk_to_figma_mcp/server.js",
-    "claude-talk-to-figma-mcp-socket": "dist/socket.js"
+    "desrid-html-to-figma": "scripts/launcher.js",
+    "desrid-html-to-figma-server": "dist/talk_to_figma_mcp/server.cjs",
+    "desrid-html-to-figma-socket": "dist/socket-node.cjs"
   },
   "files": [
+    ".codex-plugin",
+    ".mcp.json",
     "dist",
+    "skills",
     "scripts/launcher.js",
-    "src/claude_mcp_plugin/manifest.json",
+    "src/claude_mcp_plugin",
     "readme.md",
+    "INSTALL_AGENTS.md",
     "LICENSE",
     "TESTING.md",
     "CHANGELOG.md"
   ],
   "type": "module",
   "scripts": {
-    "start": "bun run dist/talk_to_figma_mcp/server.js",
-    "socket": "bun run dist/socket.js",
+    "start": "node dist/talk_to_figma_mcp/server.cjs",
+    "socket": "node dist/socket-node.cjs",
     "setup": "./scripts/setup.sh",
     "build": "tsup && chmod +x dist/talk_to_figma_mcp/server.js dist/socket.js",
     "build:win": "tsup",
@@ -29,10 +33,12 @@
     "dev": "bun run build:watch",
     "pack": "dxt pack",
     "sync-version": "VERSION=$(jq -r '.version' package.json) && jq --arg version \"$VERSION\" '.version = $version' manifest.json > manifest.tmp && mv manifest.tmp manifest.json",
-    "build:dxt": "npm run sync-version && npm run build && npm run pack",
+    "build:dxt": "npm run build:win && npm run pack",
+    "prepare": "npm run build:win",
     "pub:release": "bun run build && npm publish",
     "configure-claude": "node scripts/configure-claude.js",
     "test": "jest",
+    "test:standalone": "node scripts/smoke-standalone.mjs",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:integration": "node scripts/test-integration.js"
@@ -54,7 +60,7 @@
     "zod": "^3.25.0"
   },
   "keywords": [
-    "claude",
+    "html-to-figma",
     "figma",
     "mcp",
     "plugin",
@@ -62,14 +68,14 @@
     "design",
     "automation"
   ],
-  "author": "Xúlio Zé",
+  "author": "Desrid",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/arinspunk/claude-talk-to-figma-mcp.git"
+    "url": "https://github.com/Desrid/desrid-html-to-figma"
   },
   "bugs": {
-    "url": "https://github.com/arinspunk/claude-talk-to-figma-mcp/issues"
+    "url": "https://github.com/Desrid/desrid-html-to-figma/issues"
   },
-  "homepage": "https://github.com/arinspunk/claude-talk-to-figma-mcp#readme"
+  "homepage": "https://github.com/Desrid/desrid-html-to-figma"
 }

@@ -9,6 +9,7 @@ import { registerSvgTools } from "./svg-tools";
 import { registerVariableTools } from "./variable-tools";
 import { registerFigJamTools } from "./figjam-tools";
 import { registerStyleTools } from "./style-tools";
+import { registerHtmlImportTools } from "./html-import-tools";
 
 /**
  * Register all Figma tools to the MCP server
@@ -26,6 +27,7 @@ export function registerTools(server: McpServer): void {
   registerVariableTools(server);
   registerFigJamTools(server);
   registerStyleTools(server);
+  registerHtmlImportTools(server);
 }
 
 // Export all tool registration functions for individual usage if needed
@@ -40,4 +42,5 @@ export {
   registerVariableTools,
   registerFigJamTools,
   registerStyleTools,
+  registerHtmlImportTools,
 };

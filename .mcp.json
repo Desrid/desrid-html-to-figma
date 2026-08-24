@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "desrid_html_to_figma": {
+      "command": "node",
+      "args": [
+        "./dist/talk_to_figma_mcp/server.cjs"
+      ],
+      "cwd": ".",
+      "startup_timeout_sec": 20,
+      "tool_timeout_sec": 300
+    }
+  }
+}

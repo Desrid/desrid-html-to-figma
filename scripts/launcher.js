@@ -6,8 +6,8 @@ import path from 'path';
 import os from 'os';
 import readline from 'readline';
 
-const REPO_URL = 'https://github.com/arinspunk/claude-talk-to-figma-mcp.git';
-const FOLDER_NAME = 'claude-talk-to-figma-mcp';
+const REPO_URL = 'https://github.com/Desrid/desrid-html-to-figma.git';
+const FOLDER_NAME = 'desrid-html-to-figma';
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -118,7 +118,7 @@ async function main() {
     // 4. Start Socket Server
     console.log('\n🚀 Starting Socket Server...');
     const startCmd = engine === 'npm' ? 'node' : engine;
-    const startArgs = engine === 'npm' ? ['dist/socket.js'] : ['run', 'socket'];
+    const startArgs = engine === 'npm' ? ['dist/socket-node.cjs'] : ['run', 'socket'];
 
     const child = spawn(startCmd, startArgs, {
         stdio: 'inherit',

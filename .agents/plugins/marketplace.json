@@ -1,0 +1,21 @@
+{
+  "name": "desrid-html-to-figma",
+  "interface": {
+    "displayName": "Desrid HTML to Figma"
+  },
+  "plugins": [
+    {
+      "name": "desrid-html-to-figma",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/Desrid/desrid-html-to-figma.git",
+        "ref": "main"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Design"
+    }
+  ]
+}

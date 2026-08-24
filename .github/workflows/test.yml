@@ -34,3 +34,6 @@ jobs:
       
     - name: Run all tests
       run: bun run test
+
+    - name: Verify standalone MCP bundle
+      run: bun run test:standalone
