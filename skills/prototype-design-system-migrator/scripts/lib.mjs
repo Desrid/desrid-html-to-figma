@@ -6,6 +6,18 @@ export const DEFAULT_IGNORE = new Set([
   'coverage', 'out', 'vendor', '.cache', '.turbo', '.vercel', '.output'
 ]);
 
+export const DEFAULT_CONFIG = Object.freeze({
+  sourceRoots: ['src', 'app', 'pages', 'components'],
+  ignore: [],
+  tokenPaths: ['src/ui/foundation', 'src/ui/theme', 'styles/tokens'],
+  iconRegistryPaths: ['src/ui/icons'],
+  uiBoundaryPaths: ['src/ui', 'packages/ui'],
+  legacyPaths: ['src/legacy-ui'],
+  migratedPaths: [],
+  selectedComponentSystem: null,
+  approvedIconSizes: [14, 16, 20, 24]
+});
+
 export function parseArgs(argv = process.argv.slice(2)) {
   const args = { _: [] };
   for (let i = 0; i < argv.length; i += 1) {
@@ -57,30 +69,36 @@ export async function loadConfig(root) {
   for (const candidate of candidates) {
     if (await pathExists(candidate)) {
       const config = await readJson(candidate, {});
-      return { path: candidate, ...config };
+      return normalizeConfig({ ...DEFAULT_CONFIG, ...config, path: candidate });
     }
   }
-  return {
-    path: null,
-    sourceRoots: ['src', 'app', 'pages', 'components'],
-    ignore: [],
-    tokenPaths: ['src/ui/foundation', 'src/ui/theme', 'styles/tokens'],
-    iconRegistryPaths: ['src/ui/icons'],
-    uiBoundaryPaths: ['src/ui', 'packages/ui'],
-    legacyPaths: ['src/legacy-ui'],
-    selectedComponentSystem: null,
-    approvedIconSizes: [14, 16, 20, 24]
-  };
+  return normalizeConfig({ ...DEFAULT_CONFIG, path: null });
+}
+
+function normalizeConfig(config) {
+  const arrayKeys = [
+    'sourceRoots', 'ignore', 'tokenPaths', 'iconRegistryPaths', 'uiBoundaryPaths',
+    'legacyPaths', 'migratedPaths', 'approvedIconSizes'
+  ];
+  const normalized = { ...config };
+  for (const key of arrayKeys) {
+    if (!Array.isArray(normalized[key])) normalized[key] = [...DEFAULT_CONFIG[key]];
+  }
+  return normalized;
 }
 
 export function normalizeRelative(root, filePath) {
   return path.relative(root, filePath).split(path.sep).join('/');
 }
 
+export function normalizePrefix(prefix) {
+  return String(prefix).replaceAll('\\', '/').replace(/^\.\//, '').replace(/\/$/, '');
+}
+
 export function isWithin(relPath, prefixes = []) {
   return prefixes.some((prefix) => {
-    const normalized = prefix.replaceAll('\\', '/').replace(/^\.\//, '').replace(/\/$/, '');
-    return relPath === normalized || relPath.startsWith(`${normalized}/`);
+    const normalized = normalizePrefix(prefix);
+    return Boolean(normalized) && (relPath === normalized || relPath.startsWith(`${normalized}/`));
   });
 }
 
@@ -117,6 +135,32 @@ export async function walkFiles(root, options = {}) {
 
   await visit(root);
   return files;
+}
+
+export async function findSymlinks(root, options = {}) {
+  const ignore = new Set([...DEFAULT_IGNORE, ...(options.ignore ?? [])]);
+  const symlinks = [];
+
+  async function visit(dir) {
+    let entries;
+    try {
+      entries = await fs.readdir(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const entry of entries) {
+      if (ignore.has(entry.name)) continue;
+      const full = path.join(dir, entry.name);
+      if (entry.isSymbolicLink()) {
+        symlinks.push(full);
+        continue;
+      }
+      if (entry.isDirectory()) await visit(full);
+    }
+  }
+
+  await visit(root);
+  return symlinks;
 }
 
 export function lineNumberAt(text, index) {
