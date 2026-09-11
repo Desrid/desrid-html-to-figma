@@ -88,14 +88,22 @@ try {
         tokenPaths: ['src/ui/foundation'],
         iconRegistryPaths: ['src/ui/icons'],
         uiBoundaryPaths: ['src/ui'],
+        legacyPaths: ['src/legacy-ui'],
+        migratedPaths: ['src/features'],
         ignore: []
       }),
       'src/App.tsx': 'import { Button } from "antd"; import { Dialog } from "@mui/material"; import { IconSearch } from "@tabler/icons-react"; export const App=()=> <button>⚙</button>;',
+      'src/ui/icons/duplicates.ts': 'export { IconSearch as SearchIcon, IconSearch as MagnifierIcon } from "@tabler/icons-react";',
+      'src/legacy-ui/Button.tsx': 'export const LegacyButton=()=> null;',
+      'src/features/Profile.tsx': 'import { LegacyButton } from "../legacy-ui/Button"; export const Profile=LegacyButton;',
       'src/app.css': '.x{color:#123456;padding:13px;gap:7px}'
     });
     assert.equal(invoke('check-token-usage.mjs', ['--root', root, '--json']).status, 1);
     assert.equal(invoke('check-spacing-usage.mjs', ['--root', root, '--json']).status, 1);
-    assert.equal(invoke('check-icon-imports.mjs', ['--root', root, '--json']).status, 1);
+    const icons = invoke('check-icon-imports.mjs', ['--root', root, '--json']);
+    assert.equal(icons.status, 1);
+    assert(icons.json.findings.some((item) => item.kind === 'duplicate-semantic-icon-alias'));
+    assert.equal(invoke('check-legacy-usage.mjs', ['--root', root, '--json']).status, 1);
     const mixed = invoke('check-library-mixing.mjs', ['--root', root, '--json']);
     assert.equal(mixed.status, 1);
     assert(mixed.json.summary.featureSystems.includes('ant-design'));
@@ -108,6 +116,8 @@ try {
         tokenPaths: ['src/ui/foundation'],
         iconRegistryPaths: ['src/ui/icons'],
         uiBoundaryPaths: ['src/ui'],
+        legacyPaths: ['src/legacy-ui'],
+        migratedPaths: ['src/features'],
         selectedComponentSystem: 'ant-design',
         ignore: []
       }),
@@ -121,6 +131,7 @@ try {
     assert.equal(invoke('check-spacing-usage.mjs', ['--root', root, '--json']).status, 0);
     assert.equal(invoke('check-icon-imports.mjs', ['--root', root, '--json']).status, 0);
     assert.equal(invoke('check-library-mixing.mjs', ['--root', root, '--json']).status, 0);
+    assert.equal(invoke('check-legacy-usage.mjs', ['--root', root, '--json']).status, 0);
   });
 
   await testAsync('installer supports both agents, idempotence, and drift protection', async () => {
