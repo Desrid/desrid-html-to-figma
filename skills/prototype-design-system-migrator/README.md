@@ -105,6 +105,7 @@ node skills/prototype-design-system-migrator/scripts/check-token-usage.mjs --roo
 node skills/prototype-design-system-migrator/scripts/check-spacing-usage.mjs --root .
 node skills/prototype-design-system-migrator/scripts/check-icon-imports.mjs --root .
 node skills/prototype-design-system-migrator/scripts/check-library-mixing.mjs --root .
+node skills/prototype-design-system-migrator/scripts/check-legacy-usage.mjs --root .
 ```
 
 The scanners are heuristic. They produce evidence; they do not prove design quality or runtime correctness.
