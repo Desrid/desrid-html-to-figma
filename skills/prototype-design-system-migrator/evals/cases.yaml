@@ -18,3 +18,5 @@ cases:
     expected: policy failure when multiple full UI systems leak into feature code
   - id: installer-both-agents
     expected: project install, idempotence, drift detection, and overwrite refusal
+  - id: legacy-rollout-gate
+    expected: migrated paths cannot import configured legacy UI modules
