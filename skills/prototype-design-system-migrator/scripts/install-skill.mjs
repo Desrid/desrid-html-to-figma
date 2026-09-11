@@ -44,7 +44,7 @@ process.stdout.write(`${JSON.stringify({
   results
 }, null, 2)}\n`);
 
-if (results.some((item) => ['drifted', 'missing', 'refused', 'error'].includes(item.status))) {
+if (results.some((item) => ['drifted', 'outdated', 'missing', 'refused', 'error'].includes(item.status))) {
   process.exitCode = 1;
 }
 
