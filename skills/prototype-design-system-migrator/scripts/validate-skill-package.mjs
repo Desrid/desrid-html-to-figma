@@ -2,7 +2,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseArgs, pathExists, walkFiles } from './lib.mjs';
+import { findSymlinks, parseArgs, pathExists } from './lib.mjs';
 
 const args = parseArgs();
 const defaultRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -34,6 +34,7 @@ const required = [
   'scripts/check-spacing-usage.mjs',
   'scripts/check-icon-imports.mjs',
   'scripts/check-library-mixing.mjs',
+  'scripts/check-legacy-usage.mjs',
   'scripts/install-skill.mjs',
   'scripts/validate-skill-package.mjs',
   'evals/cases.yaml',
@@ -97,10 +98,9 @@ if (await pathExists(versionPath)) {
   if (!/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(version)) errors.push(`Invalid VERSION: ${version}`);
 }
 
-const files = await walkFiles(root, { maxBytes: 20_000_000 });
-for (const file of files) {
-  const stat = await fs.lstat(file);
-  if (stat.isSymbolicLink()) errors.push(`Symlink is not portable: ${path.relative(root, file)}`);
+const symlinks = await findSymlinks(root, { ignore: [] });
+for (const file of symlinks) {
+  errors.push(`Symlink is not portable: ${path.relative(root, file)}`);
 }
 
 const result = {
