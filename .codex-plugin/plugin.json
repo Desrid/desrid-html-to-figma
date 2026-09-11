@@ -1,7 +1,7 @@
 {
   "name": "desrid-html-to-figma",
   "version": "1.1.2",
-  "description": "Import measured HTML layouts into editable Figma frames through a local MCP bridge.",
+  "description": "Import measured HTML layouts into editable Figma frames and audit existing prototypes for conservative design-system migration.",
   "author": {
     "name": "Desrid",
     "url": "https://github.com/Desrid"
@@ -13,14 +13,16 @@
     "figma",
     "html-to-figma",
     "mcp",
-    "design"
+    "design",
+    "design-system",
+    "ui-migration"
   ],
   "skills": "./skills/",
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "Desrid HTML to Figma",
-    "shortDescription": "Editable HTML-to-Figma imports",
-    "longDescription": "Capture measured browser geometry and import it as editable Figma frames with Auto Layout through a local MCP bridge.",
+    "shortDescription": "HTML-to-Figma and UI-system workflows",
+    "longDescription": "Capture measured browser geometry for editable Figma import, or audit and incrementally normalize an existing prototype into a code-first design system through portable workflow skills.",
     "developerName": "Desrid",
     "category": "Design",
     "capabilities": [
@@ -32,7 +34,8 @@
     "defaultPrompt": [
       "Import this local page into Figma as an editable frame.",
       "Connect to my Figma channel and inspect the document.",
-      "Verify the imported frame against the browser layout."
+      "Verify the imported frame against the browser layout.",
+      "Audit this existing prototype in preserve mode before migrating its UI system."
     ]
   }
 }

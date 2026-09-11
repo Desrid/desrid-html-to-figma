@@ -1,8 +1,53 @@
-# Install Desrid HTML to Figma in AI agents
+# Install Desrid tools in AI agents
 
-Desrid HTML to Figma is a standard local `stdio` MCP server. The same server works with Codex, Claude Desktop, Claude Code, Cursor, Windsurf, Cline, Roo Code, VS Code integrations, and other clients that support local MCP servers.
+This repository contains two independent capabilities:
 
-## Shared prerequisites
+1. **Desrid HTML to Figma** — a local `stdio` MCP server plus a Figma workflow skill.
+2. **Prototype Design System Migrator** — a portable, file-based skill for Codex and Claude Code. It does not require Figma, the MCP server, or the local bridge.
+
+## Prototype Design System Migrator
+
+From a stable clone of this repository, install the same canonical skill into a project for both agents:
+
+```bash
+node skills/prototype-design-system-migrator/scripts/install-skill.mjs \
+  --agent both \
+  --scope project \
+  --target /path/to/prototype
+```
+
+This writes:
+
+```text
+<prototype>/.agents/skills/prototype-design-system-migrator/
+<prototype>/.claude/skills/prototype-design-system-migrator/
+```
+
+User-level installation:
+
+```bash
+node skills/prototype-design-system-migrator/scripts/install-skill.mjs \
+  --agent both \
+  --scope user
+```
+
+Use `--dry-run` to preview, `--check` to detect drift, and `--force` only when intentionally replacing a locally modified installed copy.
+
+Invoke in Codex:
+
+```text
+$prototype-design-system-migrator audit this existing prototype in preserve mode.
+```
+
+Invoke in Claude Code:
+
+```text
+/prototype-design-system-migrator audit this existing prototype in preserve mode.
+```
+
+The default mode is `audit-only`; it must not edit production UI. See `skills/prototype-design-system-migrator/README.md` for modes, policies, static tools, status semantics, and limitations.
+
+## Desrid HTML to Figma shared prerequisites
 
 - Node.js 18 or newer
 - Figma Desktop
@@ -55,10 +100,11 @@ The GitHub Release tarball is already pinned to `v1.1.2`. To upgrade, replace bo
 
 ## Update
 
+- Portable design-system skill: pull the repository, then rerun `install-skill.mjs`. Unmodified installed copies update safely; drift is not overwritten without `--force`.
 - Codex marketplace: `codex plugin marketplace upgrade desrid-html-to-figma`, then reinstall the plugin.
 - Git clone: `git pull`, `npm install`, and `npm run build:win`.
 - GitHub Release `npx`: replace the versioned `.tgz` URL or clear the client's package cache if it keeps an older build.
 
-## Architecture
+## HTML-to-Figma architecture
 
 The agent talks MCP over stdio to `dist/talk_to_figma_mcp/server.cjs`. That process talks WebSocket to the local bridge on port 3055. The bridge relays commands to the Figma development plugin. No Claude- or Codex-specific implementation is used for the design operations themselves.
